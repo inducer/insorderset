@@ -1,0 +1,18 @@
+[build-system]
+requires = ["scikit-build-core>=0.3", "nanobind>=1.9"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "insorderset"
+version = "0.1.0"
+description = "Insertion-ordered set for Python (C extension via nanobind)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+
+[tool.scikit-build]
+cmake.build-type = "Release"
+wheel.packages = ["src/insorderset"]
+
+[tool.pytest.ini_options]
+testpaths = ["test"]
