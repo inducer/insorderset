@@ -571,7 +571,12 @@ NB_MODULE(_insorderset_core, m) {
         .def("__next__", &InsOrderedSetIterator::__next__);
 
     /* ── OrderedSet ───────────────────────────────────────────────────── */
-    nb::class_<OrderedSet>(m, "OrderedSet")
+    nb::class_<OrderedSet>(m, "OrderedSet",
+        "Mutable insertion-ordered set.\n\n"
+        "A drop-in replacement for :class:`set` that preserves the order in\n"
+        "which elements were first inserted.  All elements must be hashable.\n\n"
+        ":class:`OrderedSet` is **not** hashable (like :class:`set`).\n"
+        "Use :class:`FrozenOrderedSet` for an immutable, hashable variant.")
         /* construction */
         .def("__init__",
              [](OrderedSet *self) { new (self) OrderedSet(); })
@@ -629,71 +634,89 @@ NB_MODULE(_insorderset_core, m) {
 
         /* mutation */
         .def("add",
-             [](OrderedSet &s, nb::handle key) { s.impl.insert(key.ptr()); })
+             [](OrderedSet &s, nb::handle key) { s.impl.insert(key.ptr()); },
+             "Add *key* to the set.  No-op if *key* is already present.")
         .def("discard",
-             [](OrderedSet &s, nb::handle key) { s.impl.discard_key(key.ptr()); })
+             [](OrderedSet &s, nb::handle key) { s.impl.discard_key(key.ptr()); },
+             "Remove *key* from the set if it is present.  No-op otherwise.")
         .def("remove",
-             [](OrderedSet &s, nb::handle key) { s.impl.remove_key(key.ptr()); })
+             [](OrderedSet &s, nb::handle key) { s.impl.remove_key(key.ptr()); },
+             "Remove *key* from the set.\n\n:raises KeyError: if *key* is not present.")
         .def("pop",
              [](OrderedSet &s) {
                  return nb::steal<nb::object>(s.impl.pop_last());
-             })
+             },
+             "Remove and return the last-inserted element.\n\n"
+             ":raises KeyError: if the set is empty.")
         .def("clear",
-             [](OrderedSet &s) { s.impl.clear_all(); })
+             [](OrderedSet &s) { s.impl.clear_all(); },
+             "Remove all elements from the set.")
 
         /* copy */
         .def("copy",
-             [](const OrderedSet &s) { return OrderedSet{s.impl}; })
+             [](const OrderedSet &s) { return OrderedSet{s.impl}; },
+             "Return a shallow copy of the set.")
 
         /* set predicates */
         .def("isdisjoint",
              [](const OrderedSet &s, nb::handle other) {
                  return impl_isdisjoint(s, other);
-             })
+             },
+             "Return ``True`` if the set has no elements in common with *other*.")
         .def("issubset",
              [](const OrderedSet &s, nb::handle other) {
                  return impl_issubset(s, other);
-             })
+             },
+             "Test whether every element of the set is in *other*.")
         .def("issuperset",
              [](const OrderedSet &s, nb::handle other) {
                  return impl_issuperset(s, other);
-             })
+             },
+             "Test whether every element of *other* is in the set.")
 
         /* set operations returning OrderedSet */
         .def("difference",
              [](const OrderedSet &s, nb::args others) {
                  return OrderedSet{compute_difference(s.impl, others)};
-             })
+             },
+             "Return a new set with elements not in any of *others*.")
         .def("intersection",
              [](const OrderedSet &s, nb::args others) {
                  return OrderedSet{compute_intersection(s.impl, others)};
-             })
+             },
+             "Return a new set with elements common to the set and all *others*.")
         .def("union",
              [](const OrderedSet &s, nb::args others) {
                  return OrderedSet{compute_union(s.impl, others)};
-             })
+             },
+             "Return a new set with elements from the set and all *others*.")
         .def("symmetric_difference",
              [](const OrderedSet &s, nb::handle other) {
                  return OrderedSet{compute_symmdiff(s.impl, other)};
-             })
+             },
+             "Return a new set with elements in either set but not both.")
 
         /* in-place mutation */
         .def("difference_update",
              [](OrderedSet &s, nb::args others) {
                  s.impl = compute_difference(s.impl, others);
-             })
+             },
+             "Remove all elements found in *others* from the set in place.")
         .def("intersection_update",
              [](OrderedSet &s, nb::args others) {
                  s.impl = compute_intersection(s.impl, others);
-             })
+             },
+             "Retain only elements also found in all *others*, in place.")
         .def("symmetric_difference_update",
              [](OrderedSet &s, nb::handle other) {
                  s.impl = compute_symmdiff(s.impl, other);
-             })
+             },
+             "Update set to the symmetric difference with *other*, in place.")
         .def("update",
              [](OrderedSet &s, nb::args others) {
                  s.impl = compute_union(s.impl, others);
-             })
+             },
+             "Add all elements from *others* to the set in place.")
 
         /* binary operators */
         .def("__and__",
@@ -751,7 +774,14 @@ NB_MODULE(_insorderset_core, m) {
              });
 
     /* ── FrozenOrderedSet ────────────────────────────────────────────── */
-    nb::class_<FrozenOrderedSet>(m, "FrozenOrderedSet")
+    nb::class_<FrozenOrderedSet>(m, "FrozenOrderedSet",
+        "Immutable insertion-ordered set.\n\n"
+        "A drop-in replacement for :class:`frozenset` that preserves the order\n"
+        "in which elements were first inserted.  All elements must be hashable.\n\n"
+        "The hash value is computed lazily on first access and then cached.  It\n"
+        "is identical to the hash of the equivalent :class:`frozenset`, so a\n"
+        ":class:`FrozenOrderedSet` can be used as a dictionary key or placed\n"
+        "inside another set interchangeably with :class:`frozenset`.")
         /* construction */
         .def("__init__",
              [](FrozenOrderedSet *self) {
@@ -816,39 +846,47 @@ NB_MODULE(_insorderset_core, m) {
         .def("copy",
              [](const FrozenOrderedSet &s) {
                  return FrozenOrderedSet{s.impl, s.cached_hash};
-             })
+             },
+             "Return a shallow copy of the set.")
 
         /* set predicates */
         .def("isdisjoint",
              [](const FrozenOrderedSet &s, nb::handle other) {
                  return impl_isdisjoint(s, other);
-             })
+             },
+             "Return ``True`` if the set has no elements in common with *other*.")
         .def("issubset",
              [](const FrozenOrderedSet &s, nb::handle other) {
                  return impl_issubset(s, other);
-             })
+             },
+             "Test whether every element of the set is in *other*.")
         .def("issuperset",
              [](const FrozenOrderedSet &s, nb::handle other) {
                  return impl_issuperset(s, other);
-             })
+             },
+             "Test whether every element of *other* is in the set.")
 
         /* set operations returning FrozenOrderedSet */
         .def("difference",
              [](const FrozenOrderedSet &s, nb::args others) {
                  return FrozenOrderedSet{compute_difference(s.impl, others), {}};
-             })
+             },
+             "Return a new set with elements not in any of *others*.")
         .def("intersection",
              [](const FrozenOrderedSet &s, nb::args others) {
                  return FrozenOrderedSet{compute_intersection(s.impl, others), {}};
-             })
+             },
+             "Return a new set with elements common to the set and all *others*.")
         .def("union",
              [](const FrozenOrderedSet &s, nb::args others) {
                  return FrozenOrderedSet{compute_union(s.impl, others), {}};
-             })
+             },
+             "Return a new set with elements from the set and all *others*.")
         .def("symmetric_difference",
              [](const FrozenOrderedSet &s, nb::handle other) {
                  return FrozenOrderedSet{compute_symmdiff(s.impl, other), {}};
-             })
+             },
+             "Return a new set with elements in either set but not both.")
 
         /* binary operators */
         .def("__and__",

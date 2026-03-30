@@ -6,7 +6,9 @@ Adapted from https://github.com/matthiasdiener/orderedsets/tree/main/test
 from __future__ import annotations
 
 import pickle
-from typing import AbstractSet, Any, FrozenSet, Generator, Set, Type, TypeVar, Union
+from collections.abc import Generator
+from collections.abc import Set as AbstractSet
+from typing import Any, TypeVar
 
 import pytest
 
@@ -19,7 +21,9 @@ ordered_set_types = (OrderedSet, FrozenOrderedSet)
 mutable_set_types = (OrderedSet, set)
 immutable_set_types = (FrozenOrderedSet, frozenset)
 
-T_set = Union[Type[OrderedSet], Type[FrozenOrderedSet], Type[Set], Type[FrozenSet]]
+T_set = (
+    type[OrderedSet] | type[FrozenOrderedSet] | type[set[Any]] | type[frozenset[Any]]
+)
 
 all_set_types = pytest.mark.parametrize("cls", set_types)
 all_ordered_set_types = pytest.mark.parametrize("cls", ordered_set_types)
@@ -29,11 +33,13 @@ all_immutable_set_types = pytest.mark.parametrize("cls", immutable_set_types)
 
 def _char_range() -> Generator[str, None, None]:
     import string
+
     yield from string.ascii_lowercase + string.ascii_uppercase
 
 
 def test_no_PYTHONHASHSEED() -> None:  # noqa: N802
     import os
+
     if "PYTHONHASHSEED" in os.environ:
         val = os.environ["PYTHONHASHSEED"]
         assert val == "random", (
@@ -293,8 +299,11 @@ def test_intersection_multiple_args(cls: T_set) -> None:
     assert s1 == s1.intersection(s1, s1)
 
     if cls in ordered_set_types:
-        assert list(s1.intersection(["a", "b", "c"], ["a", "b", "c"], s1)) \
-            == ["c", "a", "b"]
+        assert list(s1.intersection(["a", "b", "c"], ["a", "b", "c"], s1)) == [
+            "c",
+            "a",
+            "b",
+        ]
 
 
 @all_immutable_set_types
@@ -723,6 +732,7 @@ def test_ordering(cls: T_set) -> None:
 @all_ordered_set_types
 def test_isinstance(cls: T_set) -> None:
     from collections.abc import Set as abc_Set
+
     assert isinstance(cls(), AbstractSet)
     assert isinstance(cls(), abc_Set)
     assert not isinstance(cls(), set)

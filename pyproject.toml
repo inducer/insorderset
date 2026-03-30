@@ -10,9 +10,40 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 
+[project.optional-dependencies]
+docs = [
+    "sphinx>=7",
+    "furo",
+    "sphinx-copybutton",
+]
+dev = [
+    "ruff",
+    "basedpyright",
+    "pytest",
+    "sphinx>=7",
+    "furo",
+    "sphinx-copybutton",
+]
+
 [tool.scikit-build]
 cmake.build-type = "Release"
 wheel.packages = ["src/insorderset"]
 
 [tool.pytest.ini_options]
 testpaths = ["test"]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+
+[tool.basedpyright]
+include = ["src"]
+pythonVersion = "3.10"
+typeCheckingMode = "standard"
+
+[tool.cibuildwheel]
+build = "cp310-* cp311-* cp312-* cp313-*"
+test-requires = ["pytest"]
+test-command = "pytest {project}/test"

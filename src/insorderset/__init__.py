@@ -14,8 +14,8 @@ from insorderset._insorderset_core import FrozenOrderedSet, OrderedSet
 # Register with the Abstract Base Classes so that isinstance checks work:
 #   isinstance(OrderedSet(), collections.abc.Set)   -> True
 #   isinstance(OrderedSet(), typing.AbstractSet)     -> True (same ABC)
-Set.register(OrderedSet)
-Set.register(FrozenOrderedSet)
-MutableSet.register(OrderedSet)
+Set.register(OrderedSet)  # type: ignore[attr-defined]
+Set.register(FrozenOrderedSet)  # type: ignore[attr-defined]
+MutableSet.register(OrderedSet)  # type: ignore[attr-defined]
 
 __all__ = ["OrderedSet", "FrozenOrderedSet"]
