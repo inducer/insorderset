@@ -1,0 +1,69 @@
+[build-system]
+requires = ["scikit-build-core>=0.3", "nanobind>=1.9"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "insorderset"
+version = "0.1.0"
+description = "Insertion-ordered set for Python (C extension via nanobind)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT AND PSF-2.0"
+
+[project.optional-dependencies]
+docs = [
+    "sphinx>=7",
+    "furo",
+    "sphinx-copybutton",
+]
+dev = [
+    "ruff",
+    "basedpyright",
+    "pytest",
+    "sphinx>=7",
+    "furo",
+    "sphinx-copybutton",
+    "typing-extensions",
+]
+
+[tool.scikit-build]
+cmake.build-type = "Release"
+wheel.packages = ["src/insorderset"]
+
+[tool.pytest.ini_options]
+testpaths = ["test"]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+extend-select = [
+    "B",   # flake8-bugbear
+    "C",   # flake8-comprehensions
+    "E",   # pycodestyle
+    "F",   # pyflakes
+    "G",   # flake8-logging-format
+    "I",   # flake8-isort
+    "N",   # pep8-naming
+    "NPY", # numpy
+    "PGH", # pygrep-hooks
+    "Q",   # flake8-quotes
+    "RUF", # ruff
+    "SIM", # flake8-simplify
+    "TC",  # flake8-type-checking
+    "UP",  # pyupgrade
+    "W",   # pycodestyle
+    "FURB",
+]
+extend-ignore = [
+    "RUF067",
+]
+
+[tool.basedpyright]
+include = ["src", "test"]
+pythonVersion = "3.10"
+reportExplicitAny = "hint"
+
+[tool.cibuildwheel]
+test-requires = ["pytest"]
+test-command = "pytest {project}/test"

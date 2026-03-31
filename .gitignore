@@ -1,0 +1,28 @@
+# Build artifacts
+build/
+dist/
+*.egg-info/
+_skbuild/
+_cmake_test_compile/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.so
+*.pyd
+*.dylib
+
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Docs build output
+docs/_build/
+
+# Editors / OS
+.DS_Store
+*.swp
+.vscode/
+.idea/
