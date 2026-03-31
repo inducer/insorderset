@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Insertion-ordered set for Python (C extension via nanobind)"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = "MIT AND PSF-2.0"
 
 [project.optional-dependencies]
 docs = [

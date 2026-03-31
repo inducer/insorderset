@@ -9,6 +9,11 @@
  * Exposed types:
  *   OrderedSet       – mutable, unhashable
  *   FrozenOrderedSet – immutable, hashable (same hash as frozenset)
+ *
+ * Parts derived from
+ * https://github.com/python/cpython/blob/62a6e898e017c9878490544f6a227b8a187a949c/Objects/dictobject.c
+ * Copyright/license as specified in
+ * https://github.com/python/cpython/blob/62a6e898e017c9878490544f6a227b8a187a949c/LICENSE
  */
 
 #include <nanobind/nanobind.h>
