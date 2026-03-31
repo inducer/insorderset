@@ -618,20 +618,40 @@ NB_MODULE(_insorderset_core, m) {
              })
         .def("__le__",
              [](const OrderedSet &s, nb::handle other) {
+                 if (!PyAnySet_Check(other.ptr()) &&
+                     !nb::isinstance<OrderedSet>(other) &&
+                     !nb::isinstance<FrozenOrderedSet>(other)) {
+                     return nb::not_implemented();
+                 }
                  return impl_issubset(s, other);
              })
         .def("__lt__",
              [](const OrderedSet &s, nb::handle other) {
+                 if (!PyAnySet_Check(other.ptr()) &&
+                     !nb::isinstance<OrderedSet>(other) &&
+                     !nb::isinstance<FrozenOrderedSet>(other)) {
+                     return nb::not_implemented();
+                 }
                  Py_ssize_t olen = PyObject_Length(other.ptr());
                  if (olen == -1) throw nb::python_error();
                  return s.impl.used < olen && impl_issubset(s, other);
              })
         .def("__ge__",
              [](const OrderedSet &s, nb::handle other) {
+                 if (!PyAnySet_Check(other.ptr()) &&
+                     !nb::isinstance<OrderedSet>(other) &&
+                     !nb::isinstance<FrozenOrderedSet>(other)) {
+                     return nb::not_implemented();
+                 }
                  return impl_issuperset(s, other);
              })
         .def("__gt__",
              [](const OrderedSet &s, nb::handle other) {
+                 if (!PyAnySet_Check(other.ptr()) &&
+                     !nb::isinstance<OrderedSet>(other) &&
+                     !nb::isinstance<FrozenOrderedSet>(other)) {
+                     return nb::not_implemented();
+                 }
                  Py_ssize_t olen = PyObject_Length(other.ptr());
                  if (olen == -1) throw nb::python_error();
                  return s.impl.used > olen && impl_issuperset(s, other);
