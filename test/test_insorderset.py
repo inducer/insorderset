@@ -731,10 +731,10 @@ def test_ordering(cls: T_set) -> None:
 
 @all_ordered_set_types
 def test_isinstance(cls: T_set) -> None:
-    from collections.abc import Set as abc_Set
+    from typing import AbstractSet as TypingAbstractSet
 
     assert isinstance(cls(), AbstractSet)
-    assert isinstance(cls(), abc_Set)
+    assert isinstance(cls(), TypingAbstractSet)
     assert not isinstance(cls(), set)
     assert not isinstance(cls(), frozenset)
 
