@@ -27,13 +27,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.x"
       - name: Install package and type-checker
         run: |
-          pip install nanobind scikit-build-core
-          pip install -e .
+          pip install typing-extensions pytest
+          pip install .
           pip install basedpyright
-      - run: basedpyright
+      - run: basedpyright --baselinemode=auto
 
   pytest:
     runs-on: ubuntu-latest

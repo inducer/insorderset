@@ -23,6 +23,7 @@ dev = [
     "sphinx>=7",
     "furo",
     "sphinx-copybutton",
+    "typing-extensions",
 ]
 
 [tool.scikit-build]
@@ -36,14 +37,33 @@ testpaths = ["test"]
 line-length = 88
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I"]
+extend-select = [
+    "B",   # flake8-bugbear
+    "C",   # flake8-comprehensions
+    "E",   # pycodestyle
+    "F",   # pyflakes
+    "G",   # flake8-logging-format
+    "I",   # flake8-isort
+    "N",   # pep8-naming
+    "NPY", # numpy
+    "PGH", # pygrep-hooks
+    "Q",   # flake8-quotes
+    "RUF", # ruff
+    "SIM", # flake8-simplify
+    "TC",  # flake8-type-checking
+    "UP",  # pyupgrade
+    "W",   # pycodestyle
+    "FURB",
+]
+extend-ignore = [
+    "RUF067",
+]
 
 [tool.basedpyright]
-include = ["src"]
+include = ["src", "test"]
 pythonVersion = "3.10"
-typeCheckingMode = "standard"
+reportExplicitAny = "hint"
 
 [tool.cibuildwheel]
-build = "cp310-* cp311-* cp312-* cp313-*"
 test-requires = ["pytest"]
 test-command = "pytest {project}/test"
