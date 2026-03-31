@@ -847,24 +847,47 @@ NB_MODULE(_insorderset_core, m) {
                  return impl_eq(s, other);
              })
         .def("__le__",
-             [](const FrozenOrderedSet &s, nb::handle other) {
-                 return impl_issubset(s, other);
+             [](const FrozenOrderedSet &s, nb::handle other) -> nb::object {
+                 // Match frozenset: only compare with set-like operands
+                 if (!PyAnySet_Check(other.ptr()) &&
+                     !nb::isinstance<OrderedSet>(other) &&
+                     !nb::isinstance<FrozenOrderedSet>(other)) {
+                     return nb::borrow<nb::object>(Py_NotImplemented);
+                 }
+                 return nb::bool_(impl_issubset(s, other));
              })
         .def("__lt__",
-             [](const FrozenOrderedSet &s, nb::handle other) {
+             [](const FrozenOrderedSet &s, nb::handle other) -> nb::object {
+                 if (!PyAnySet_Check(other.ptr()) &&
+                     !nb::isinstance<OrderedSet>(other) &&
+                     !nb::isinstance<FrozenOrderedSet>(other)) {
+                     return nb::borrow<nb::object>(Py_NotImplemented);
+                 }
                  Py_ssize_t olen = PyObject_Length(other.ptr());
                  if (olen == -1) throw nb::python_error();
-                 return s.impl.used < olen && impl_issubset(s, other);
+                 bool result = (s.impl.used < olen) && impl_issubset(s, other);
+                 return nb::bool_(result);
              })
         .def("__ge__",
-             [](const FrozenOrderedSet &s, nb::handle other) {
-                 return impl_issuperset(s, other);
+             [](const FrozenOrderedSet &s, nb::handle other) -> nb::object {
+                 if (!PyAnySet_Check(other.ptr()) &&
+                     !nb::isinstance<OrderedSet>(other) &&
+                     !nb::isinstance<FrozenOrderedSet>(other)) {
+                     return nb::borrow<nb::object>(Py_NotImplemented);
+                 }
+                 return nb::bool_(impl_issuperset(s, other));
              })
         .def("__gt__",
-             [](const FrozenOrderedSet &s, nb::handle other) {
+             [](const FrozenOrderedSet &s, nb::handle other) -> nb::object {
+                 if (!PyAnySet_Check(other.ptr()) &&
+                     !nb::isinstance<OrderedSet>(other) &&
+                     !nb::isinstance<FrozenOrderedSet>(other)) {
+                     return nb::borrow<nb::object>(Py_NotImplemented);
+                 }
                  Py_ssize_t olen = PyObject_Length(other.ptr());
                  if (olen == -1) throw nb::python_error();
-                 return s.impl.used > olen && impl_issuperset(s, other);
+                 bool result = (s.impl.used > olen) && impl_issuperset(s, other);
+                 return nb::bool_(result);
              })
 
         /* copy */
