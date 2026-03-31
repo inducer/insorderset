@@ -18,6 +18,9 @@ __pycache__/
 *.pyo
 .pytest_cache/
 
+# Docs build output
+docs/_build/
+
 # Editors / OS
 .DS_Store
 *.swp

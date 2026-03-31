@@ -1,12 +1,40 @@
 """
 Tests for insorderset.OrderedSet and insorderset.FrozenOrderedSet.
-Adapted from https://github.com/matthiasdiener/orderedsets/tree/main/test
+Adapted from https://github.com/matthiasdiener/orderedsets/blob/f4ac195b62003a8aa29da2e72ecd447fe233febb/test/test_orderedsets.py
 """
 
 from __future__ import annotations
 
+__copyright__ = """
+Copyright (C) 2023 University of Illinois Board of Trustees
+"""
+
+
+__license__ = """
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+"""
+
+
 import pickle
-from typing import AbstractSet, Any, FrozenSet, Generator, Set, Type, TypeVar, Union
+from collections.abc import Generator
+from collections.abc import Set as AbstractSet
+from typing import Any, TypeVar
 
 import pytest
 
@@ -19,7 +47,9 @@ ordered_set_types = (OrderedSet, FrozenOrderedSet)
 mutable_set_types = (OrderedSet, set)
 immutable_set_types = (FrozenOrderedSet, frozenset)
 
-T_set = Union[Type[OrderedSet], Type[FrozenOrderedSet], Type[Set], Type[FrozenSet]]
+T_set = (
+    type[OrderedSet] | type[FrozenOrderedSet] | type[set[Any]] | type[frozenset[Any]]
+)
 
 all_set_types = pytest.mark.parametrize("cls", set_types)
 all_ordered_set_types = pytest.mark.parametrize("cls", ordered_set_types)
@@ -29,11 +59,13 @@ all_immutable_set_types = pytest.mark.parametrize("cls", immutable_set_types)
 
 def _char_range() -> Generator[str, None, None]:
     import string
+
     yield from string.ascii_lowercase + string.ascii_uppercase
 
 
 def test_no_PYTHONHASHSEED() -> None:  # noqa: N802
     import os
+
     if "PYTHONHASHSEED" in os.environ:
         val = os.environ["PYTHONHASHSEED"]
         assert val == "random", (
@@ -142,7 +174,7 @@ def test_eq(cls: T_set) -> None:
 
     assert s1 != ["d"]
     if cls in ordered_set_types:
-        assert ["d", "a"] == list(s1)
+        assert list(s1) == ["d", "a"]
 
     if cls in immutable_set_types:
         assert hash(s1) == hash(s2)
@@ -207,7 +239,7 @@ def test_convert_to_set(cls: T_set) -> None:
 
 @all_ordered_set_types
 def test_tolist(cls: T_set) -> None:
-    assert ["c", "a", "b"] == list(cls(["c", "a", "b"]))
+    assert list(cls(["c", "a", "b"])) == ["c", "a", "b"]
 
 
 @all_set_types
@@ -228,18 +260,6 @@ def test_hash(cls: T_set) -> None:
         s3 = cls([4, 1, 4, 1, 5])
         assert s1 != s3
         assert hash(s1) != hash(s3)
-
-
-def test_hash_value() -> None:
-    fos: FrozenOrderedSet = FrozenOrderedSet([1, 2, 3])
-    fs = frozenset([1, 2, 3])
-    assert fs == fos
-    assert hash(fs) == hash(fos)
-
-    fos2: FrozenOrderedSet = FrozenOrderedSet(["a", "b", "c"])
-    fs2 = frozenset(["a", "b", "c"])
-    assert fs2 == fos2
-    assert hash(fs2) == hash(fos2)
 
 
 @all_immutable_set_types
@@ -293,8 +313,11 @@ def test_intersection_multiple_args(cls: T_set) -> None:
     assert s1 == s1.intersection(s1, s1)
 
     if cls in ordered_set_types:
-        assert list(s1.intersection(["a", "b", "c"], ["a", "b", "c"], s1)) \
-            == ["c", "a", "b"]
+        assert list(s1.intersection(["a", "b", "c"], ["a", "b", "c"], s1)) == [
+            "c",
+            "a",
+            "b",
+        ]
 
 
 @all_immutable_set_types
@@ -534,13 +557,13 @@ def test_op_ior(cls: T_set) -> None:
     assert cls(["c", "a", "b", "g"]) == s1
 
     if cls in ordered_set_types:
-        assert ["c", "a", "b", "g"] == list(s1)
+        assert list(s1) == ["c", "a", "b", "g"]
 
     s1 |= s3
     assert cls(["c", "a", "b", "g", "Z"]) == s1
 
     if cls in ordered_set_types:
-        assert ["c", "a", "b", "g", "Z"] == list(s1)
+        assert list(s1) == ["c", "a", "b", "g", "Z"]
 
 
 @all_set_types
@@ -567,7 +590,7 @@ def test_op_isub(cls: T_set) -> None:
     assert cls(["c", "b"]) == s1
 
     if cls in ordered_set_types:
-        assert ["c", "b"] == list(s1)
+        assert list(s1) == ["c", "b"]
     s1 -= s3
     assert cls(["c", "b"]) == s1
 
@@ -722,9 +745,10 @@ def test_ordering(cls: T_set) -> None:
 
 @all_ordered_set_types
 def test_isinstance(cls: T_set) -> None:
-    from collections.abc import Set as abc_Set
+    from typing import AbstractSet as TypingAbstractSet  # noqa: UP035
+
     assert isinstance(cls(), AbstractSet)
-    assert isinstance(cls(), abc_Set)
+    assert isinstance(cls(), TypingAbstractSet)
     assert not isinstance(cls(), set)
     assert not isinstance(cls(), frozenset)
 

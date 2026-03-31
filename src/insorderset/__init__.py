@@ -7,15 +7,13 @@ Provides :class:`OrderedSet` (mutable) and :class:`FrozenOrderedSet`
 
 from __future__ import annotations
 
-from collections.abc import MutableSet, Set
+from collections.abc import MutableSet as abc_MutableSet
+from collections.abc import Set as abc_Set
 
 from insorderset._insorderset_core import FrozenOrderedSet, OrderedSet
 
-# Register with the Abstract Base Classes so that isinstance checks work:
-#   isinstance(OrderedSet(), collections.abc.Set)   -> True
-#   isinstance(OrderedSet(), typing.AbstractSet)     -> True (same ABC)
-Set.register(OrderedSet)
-Set.register(FrozenOrderedSet)
-MutableSet.register(OrderedSet)
+abc_Set.register(OrderedSet)  # pyright: ignore[reportUnknownMemberType, reportAttributeAccessIssue]
+abc_Set.register(FrozenOrderedSet)  # pyright: ignore[reportUnknownMemberType, reportAttributeAccessIssue]
+abc_MutableSet.register(OrderedSet)  # pyright: ignore[reportUnknownMemberType, reportAttributeAccessIssue]
 
-__all__ = ["OrderedSet", "FrozenOrderedSet"]
+__all__ = ["FrozenOrderedSet", "OrderedSet"]
